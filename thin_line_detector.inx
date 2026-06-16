@@ -3,9 +3,15 @@
   <name>Thin Line Detector</name>
   <id>io.github.charleswest775.thinlinedetector</id>
 
+  <param name="measure" type="optiongroup" appearance="combo"
+         gui-text="Detect thin:">
+    <option value="fill">Filled shapes (sliver thickness)</option>
+    <option value="stroke">Stroke width (pen thickness)</option>
+  </param>
+
   <param name="threshold" type="float" precision="3" min="0" max="100"
          appearance="full"
-         gui-text="Threshold — strokes this width or thinner match:">1.000</param>
+         gui-text="Threshold — features this thin or thinner match:">1.000</param>
 
   <param name="unit" type="optiongroup" appearance="combo"
          gui-text="Threshold unit:">
@@ -16,8 +22,8 @@
   </param>
 
   <param name="mode" type="optiongroup" appearance="combo" gui-text="Action:">
-    <option value="highlight">Highlight matches (recolor stroke)</option>
-    <option value="thicken">Thicken matches to threshold width</option>
+    <option value="highlight">Highlight matches (review)</option>
+    <option value="thicken">Thicken matches (stroke mode only)</option>
     <option value="delete">Delete matches</option>
   </param>
 
@@ -29,16 +35,20 @@
   <param name="highlight_color" type="string"
          gui-text="Highlight color (CSS hex):">#ff0000</param>
 
-  <param name="info" type="description" xml:space="preserve">Workflow: tick the "Live preview" box below, then drag the Threshold slider — strokes at or below the chosen width recolor on the canvas in real time so you can dial in the cutoff. Then switch Action to Thicken (raise hairlines to a safe minimum width) or Delete and click Apply.
+  <param name="info" type="description" xml:space="preserve">Workflow: tick the "Live preview" box below, then drag the Threshold slider — matching features light up on the canvas in real time so you can dial in the cutoff. Then choose Delete (or Thicken, in stroke mode) and click Apply.
 
-Width is measured as rendered: stroke-width is resolved through inherited styles, converted to user units, and scaled by the object's transforms (a 2px stroke inside a scale(0.1) group counts as 0.2px). Objects flagged non-scaling-stroke keep their nominal width. Objects with no stroke are ignored. Tip: set the unit to mm or pt to find lines below your laser/plotter/print minimum.</param>
+Detect thin → Filled shapes: measures each filled shape's thickness as 2 × area ÷ perimeter, per subpath — so thin slivers inside a single compound path (traced / laser / stencil / mandala art) are caught at any angle. Highlight outlines them in the chosen colour; Delete drops the thin subpaths and keeps the rest. Only filled shapes are considered.
+
+Detect thin → Stroke width: measures stroke-width, resolved through inherited styles, converted to user units, and scaled by the object's transforms (a 2px stroke inside scale(0.1) counts as 0.2px); non-scaling-stroke is respected; objects with no stroke are ignored.
+
+Tip: set the unit to mm or pt to match your laser / plotter / print minimum.</param>
 
   <effect needs-live-preview="true">
     <object-type>all</object-type>
     <effects-menu>
       <submenu name="Cleanup"/>
     </effects-menu>
-    <menu-tip>Find hairline / sub-pixel strokes below a width threshold and highlight, thicken, or delete them.</menu-tip>
+    <menu-tip>Find thin filled slivers or hairline strokes below a width threshold and highlight or delete them.</menu-tip>
   </effect>
 
   <script>
